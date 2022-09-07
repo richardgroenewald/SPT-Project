@@ -21,21 +21,22 @@ stockdata = lapply(stockdata, function(x) x[order(x$marketcap, decreasing = TRUE
 n = 4
 Tm = length(stockdata)
 
-#to test if method works (remove bottom two rows of every date)
-stockdata = lapply(stockdata, function(x) x[1:n,])
-
 #add p(t), q(t) to each date
 #helper function - d1 and d2 are dataframes representing present (d1) and future (d2) dates
 pq.add.ranked = function(d1, d2){
-  
+  #define function output, compute p
   out = d1
   date2 = d2
-  out$p = c(d1$marketcap[1:n]/sum(d1$marketcap[1:n]), rep(NA, nrow(d1) - n))
+  out$p = c(out$marketcap[1:n]/sum(out$marketcap[1:n]), rep(NA, nrow(d1) - n))
   
+  #if any tickers are delisted
+  delisted.tickers = which(! (out$ticker %in% date2$ticker) )
+  #add them to date2
+  date2 = rbind(date2, out[delisted.tickers, !(colnames(out) %in% c("p"))])
+  #identify rows which contribute to q
   q.inds = which(date2$ticker %in% out$ticker[1:n])
   
-  delisted.tickers = 
-  
+  #modelling total return as 1 if stock was delisted
   date2$q = NA
   date2$q[q.inds] = date2$marketcap[q.inds]/sum(date2$marketcap[q.inds])
   date2 = date2[,c("ticker", "q")]
@@ -58,5 +59,4 @@ q = do.call(cbind, lapply(stockdata, function(x) x$q[1:n])); colnames(q) = names
 #write.csv(p, "p_mtx.csv")
 #write.csv(q, "q_mtx.csv")
 
-#WRITE CODE TO ACCOUNT FOR DELISTINGS!!!
 #PERHAPS WRITE FOR VARYING CATEGORIES? (LATER)
