@@ -2,8 +2,8 @@
 #takes input of CSV file containing market capitalization data
 
 #load and format data
-stockdata = read.csv("C:/Users/richa/Downloads/testdata.csv")[,-4]
-colnames(stockdata) = c("name", "ticker", "date", "price", "marketcap", "sharesoutstanding")
+stockdata = read.csv("C:/Users/richa/Downloads/sp500data.csv")
+#colnames(stockdata) = c("name", "ticker", "date", "price", "marketcap", "sharesoutstanding")
 stockdata = as.data.frame(apply(stockdata, 2, function(x) gsub(",", "", x)))
 stockdata[,c("price", "marketcap", "sharesoutstanding")] = apply(stockdata[,c("price", "marketcap", "sharesoutstanding")], 2, as.numeric)
 stockdata$date = as.Date(stockdata$date, "%Y%m%d")
