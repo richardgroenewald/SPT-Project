@@ -1,11 +1,11 @@
 tic
-
+format longg
 %helper function
 subindex = @(A, r, c) A(r,c);
 
-grid = readmatrix('C:/Users/richa/Downloads/grid.csv');
-p = readmatrix('C:/Users/richa/Downloads/u_data.csv');
-q = readmatrix('C:/Users/richa/Downloads/v_data.csv');
+grid = readmatrix('C:/Users/richa/Downloads/grid2.csv');
+p = readmatrix('C:/Users/richa/Downloads/p_mtx.csv');
+q = readmatrix('C:/Users/richa/Downloads/q_mtx.csv');
 
 %number of points to evaluate function, obtain intervals
 d = length(grid);
@@ -19,7 +19,7 @@ alpha = 100;
 J = 3;
 
 %categories - 3 of equal size for this toy example (need to correspond with the categories in the data cleaning file, in the non ranked based case)
-r = [0 7 14 21];
+r = [0 33 66 100];
 cellcutoffs = cell(J);
 for j = 1:J
     cellcutoffs{j} = (r(j)+1):r(j+1);
