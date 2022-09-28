@@ -2,7 +2,7 @@ tic
 
 format longg
 
-grid = readmatrix('C:/Users/richa/Downloads/Project/grid.csv');
+grid = readmatrix('C:/Users/richa/Downloads/grid2.csv');
 p = readmatrix('C:/Users/richa/Downloads/p_mtx.csv');
 q = readmatrix('C:/Users/richa/Downloads/q_mtx.csv');
 
@@ -10,6 +10,10 @@ q = readmatrix('C:/Users/richa/Downloads/q_mtx.csv');
 d = length(grid);
 int_lengths = diff(grid);
 beta = 1000000;
+
+testpts = [0.0045 0.032];
+idxs = arrayfun(@(x) find(x < grid, 1)-1, testpts);
+%disp(idxs');
 
 %number of rank based classes
 J = 3;
@@ -31,7 +35,7 @@ T = dims(2);
 %number of stocks (= number of ranks)
 n = dims(1);
 %index of the zero value for the functions l_j
-zero_ind = find(0.5 == grid,1);
+zero_ind = find(0.15 == grid,1);
 
 %checking with print statements
 %fprintf('n is %d\n ', n);
@@ -70,7 +74,7 @@ obj_diff = inf;
 tol = 1e-02;
 k = 1;
 
-while obj_diff > tol && k <=1 %l_diff > tol || lambda_diff > tol
+while obj_diff > tol && k <=20 %l_diff > tol || lambda_diff > tol
 
 l_old = l;
 lambda_old = lambda;
@@ -102,7 +106,7 @@ cvx_begin
             for i = 1:(d-2)
                 %constraint (3.1) - exponential concavity approximation
                 w = int_lengths(i)/(int_lengths(i+1) + int_lengths(i));
-                -l((j-1)*d + i+1) + log( w*exp(l((j-1)*d + i+2)) + (1-w)*exp(l((j-1)*d + i)) ) <= 0;
+                -l((j-1)*d + i+1) + log( w*exp(l((j-1)*d + i+2) + (1-w)*exp(l((j-1)*d + i))) ) <= 0;
 
                 %constraint (3.2) - beta Lipschitz derivatives approximation
                 dl((j-1)*d + i+1)/int_lengths(i+1) - dl((j-1)*d + i)/int_lengths(i) >= -beta*(int_lengths(i+1)+int_lengths(i))/2;

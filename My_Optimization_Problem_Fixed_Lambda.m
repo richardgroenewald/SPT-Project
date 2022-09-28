@@ -3,9 +3,12 @@ format longg
 %helper function
 subindex = @(A, r, c) A(r,c);
 
-grid = readmatrix('C:/Users/richa/Downloads/grid2.csv');
+grid = readmatrix('C:/Users/richa/Downloads/Project/grid2.csv');
 p = readmatrix('C:/Users/richa/Downloads/p_mtx.csv');
 q = readmatrix('C:/Users/richa/Downloads/q_mtx.csv');
+
+p = p(:, 1:100);
+q = q(:, 1:100);
 
 %number of points to evaluate function, obtain intervals
 d = length(grid);
