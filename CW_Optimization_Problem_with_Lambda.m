@@ -12,17 +12,14 @@ int_lengths = diff(grid);
 beta = 1000000;
 
 %number of rank based classes
-J = 3;
+J = 1;
 
 %categories - 3 of equal size for this toy example
-r = [0 33 66 100];
+r = [0 100];
 cellcutoffs = cell(J);
 for j = 1:J
     cellcutoffs{j} = (r(j)+1):r(j+1);
 end
-
-%disp(cellcutoffs);
-%disp(length(cellcutoffs{j}));
 
 dims = size(p);
 %number of time periods
@@ -32,10 +29,6 @@ T = dims(2);
 n = dims(1);
 %index of the zero value for the functions l_j
 zero_ind = find(0.5 == grid,1);
-
-%checking with print statements
-%fprintf('n is %d\n ', n);
-%fprintf('T is %d\n ', T);
 
 category = 1:n;
 %vector to add to indices below
@@ -116,6 +109,8 @@ cvx_begin
             l((j-1)*d + zero_ind) == 0;
         end
 cvx_end
+
+z_1 = cvx_optval;
 
 %optimization problem for lambda
 cvx_begin
