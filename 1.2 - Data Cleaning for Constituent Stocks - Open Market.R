@@ -92,8 +92,8 @@ p = do.call(cbind, lapply(stockdata.pq, function(x) x$p[1:n])); colnames(p) = na
 q = do.call(cbind, lapply(stockdata.pq, function(x) x$q[1:n])); colnames(q) = names(stockdata.pq)
 
 #write to csv
-write.table(p, "C:/Users/richa/Downloads/p_mtx.csv", row.names = FALSE, col.names = FALSE)
-write.table(q, "C:/Users/richa/Downloads/q_mtx.csv", row.names = FALSE, col.names = FALSE)
+write.csv(p, "C:/Users/richa/Downloads/p_mtx.csv", row.names = FALSE)
+write.csv(q, "C:/Users/richa/Downloads/q_mtx.csv", row.names = FALSE)
 
 #PERHAPS WRITE FOR VARYING CATEGORIES? (LATER)
 #PERHAPS ONLY CONSIDER TRADING IN STOCKS WHICH HAVE NOT RECENTLY HAD AN IPO

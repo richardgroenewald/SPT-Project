@@ -1,9 +1,31 @@
 tic
+
 format longg
 
-grid = readmatrix('C:/Users/richa/Downloads/Project/grid2.csv');
-p = readmatrix('C:/Users/richa/Downloads/p_mtx.csv');
-q = readmatrix('C:/Users/richa/Downloads/q_mtx.csv');
+%load data
+grid = readmatrix('C:/Users/richa/Downloads/Project/1.3 - grid.csv');
+p_total = readmatrix('C:/Users/richa/Downloads/p_mtx.csv', 'NumHeaderLines', 1);
+q_total = readmatrix('C:/Users/richa/Downloads/q_mtx.csv', 'NumHeaderLines', 1);
+
+%compute dimensions
+dims = size(p_total);
+%time period to use during fit, prop = proportion of data used to train
+prop = 0.75;
+start = 1;
+finish = dims(2);
+T = floor((finish-start)*prop);
+
+%end fitting period at December 31st, 2002 instead:
+T = 11580;
+
+%number of stocks (= number of ranks)
+n = dims(1);
+
+%split off training set
+p = p_total(:, start:(start+T));
+q = q_total(:, start:(start+T));
+p_test = p_total(:, (start+T+1):finish);
+q_test = q_total(:, (start+T+1):finish);
 
 %number of points to evaluate function, obtain intervals
 d = length(grid);
@@ -16,18 +38,12 @@ alpha = 100;
 %number of classes in partition
 J = 3;
 
-%categories - 3 of equal size for this toy example (need to correspond with the categories in the data cleaning file, in the non ranked based case)
+%categories - 4 of equal size for this toy example (need to correspond with the categories in the data cleaning file, in the non ranked based case)
 r = [0 33 66 100];
 cellcutoffs = cell(J);
 for j = 1:J
     cellcutoffs{j} = (r(j)+1):r(j+1);
 end
-
-dims = size(p);
-%number of time periods
-T = dims(2);
-%number of stocks (= number of ranks)
-n = dims(1);
 
 %construct vector of categories corresponding to stocks
 category = 1:n;
@@ -75,14 +91,14 @@ cvx_begin
         for j = 1:J
             for i = 1:(d-2)
                 %constraint (3.9) - exponential concavity approximation
-                dphi((j-1)*d + i) + (phi(i+1))^2 <= 0;
+                dphi((j-1)*d + i) + (phi((j-1)*d + i+1))^2 <= 0;
 
                 %constraint (3.11) - alpha Lipschitz second derivatives approximation
-                dphi((j-1)*d + i+1)*int_lengths(i+1) - dphi((j-1)*d + i)*int_lengths(i) <= alpha*(int_lengths(i+1)+int_lengths(i))/2;
-                dphi((j-1)*d + i+1)*int_lengths(i+1) - dphi((j-1)*d + i)*int_lengths(i) >= -alpha*(int_lengths(i+1)+int_lengths(i))/2;
+                %dphi((j-1)*d + i+1)*int_lengths(i+1) - dphi((j-1)*d + i)*int_lengths(i) <= alpha*(int_lengths(i+1)+int_lengths(i))/2;
+                %dphi((j-1)*d + i+1)*int_lengths(i+1) - dphi((j-1)*d + i)*int_lengths(i) >= -alpha*(int_lengths(i+1)+int_lengths(i))/2;
             end
             %only did to d-2 for (3.9) in above loop
-            dphi((j-1)*d + d-1) + (phi(d))^2 <= 0;
+            dphi((j-1)*d + d-1) + (phi((j-1)*d + d))^2 <= 0;
 
             %constraint (3.10) - boundedness of derivatives
             phi((j-1)*d + d) >= 0;
@@ -90,5 +106,17 @@ cvx_begin
 
         end
 cvx_end
+
+%test results
+delta_pq = q_test - p_test;
+indices = arrayfun(@(x) find(x < grid,1) - 1, p_test);
+phi_indices = indices + adj;
+lambda = repmat(1/n, J, 1);
+z = log(1 + sum(delta_pq .* lambdas .*  (phi(phi_indices) + (dphi(phi_indices) ./ int_lengths(indices)).*(p_test - grid(indices))), 1));
+test_my_wealth = sum(z);
+
+plot(cumsum(z));
+
+writematrix(phi, "phi.csv");
 
 toc
