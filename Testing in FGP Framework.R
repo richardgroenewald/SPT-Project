@@ -97,3 +97,5 @@ dev.off()
 #     constraint.mtx[(j-1)*(d-2) + i, 2] = alpha*(int.lengths[i+1]+int.lengths[i])/2
 #   }
 # }
+
+
